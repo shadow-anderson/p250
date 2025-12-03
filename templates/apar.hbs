@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APAR - {{employee.name}}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', 'Helvetica', sans-serif;
+      font-size: 11pt;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    .container {
+      max-width: 100%;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 3px solid #2563eb;
+      padding-bottom: 20px;
+    }
+
+    .header h1 {
+      color: #2563eb;
+      font-size: 24pt;
+      margin-bottom: 10px;
+    }
+
+    .header h2 {
+      color: #666;
+      font-size: 14pt;
+      font-weight: normal;
+    }
+
+    .info-section {
+      margin-bottom: 25px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-left: 4px solid #2563eb;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .info-item {
+      padding: 5px 0;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #555;
+      display: inline-block;
+      width: 150px;
+    }
+
+    .info-value {
+      color: #333;
+    }
+
+    .section-title {
+      font-size: 16pt;
+      color: #2563eb;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .score-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .score-card .score {
+      font-size: 48pt;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .score-card .grade {
+      font-size: 24pt;
+      background-color: rgba(255, 255, 255, 0.2);
+      padding: 5px 20px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #2563eb;
+      color: white;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .kpi-category {
+      background-color: #e3f2fd;
+      font-weight: bold;
+      font-size: 12pt;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+      text-align: center;
+      color: white;
+      font-size: 10pt;
+      line-height: 20px;
+      font-weight: bold;
+    }
+
+    .evidence-item {
+      padding: 10px;
+      margin: 10px 0;
+      background-color: #f5f5f5;
+      border-left: 3px solid #4caf50;
+      border-radius: 4px;
+    }
+
+    .evidence-date {
+      font-size: 9pt;
+      color: #666;
+      font-style: italic;
+    }
+
+    .remarks-box {
+      padding: 15px;
+      background-color: #fff8e1;
+      border-left: 4px solid #ffc107;
+      margin: 15px 0;
+      font-style: italic;
+    }
+
+    .signature-section {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
+
+    .signature-box {
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .signature-line {
+      border-top: 1px solid #333;
+      margin-top: 40px;
+      padding-top: 10px;
+      text-align: center;
+    }
+
+    .digital-signature {
+      margin-top: 40px;
+      padding: 20px;
+      background-color: #e8f5e9;
+      border: 2px solid #4caf50;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .digital-signature img {
+      max-width: 100px;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 9pt;
+      font-weight: bold;
+    }
+
+    .badge-success {
+      background-color: #4caf50;
+      color: white;
+    }
+
+    .badge-warning {
+      background-color: #ff9800;
+      color: white;
+    }
+
+    .badge-danger {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .page-break {
+      page-break-after: always;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>ANNUAL PERFORMANCE ASSESSMENT REPORT</h1>
+      <h2>{{period.fiscalYear}}</h2>
+    </div>
+
+    <!-- Employee Information -->
+    <div class="info-section">
+      <h3>Employee Information</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Name:</span>
+          <span class="info-value">{{employee.name}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Employee Code:</span>
+          <span class="info-value">{{employee.employeeCode}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Division:</span>
+          <span class="info-value">{{employee.division}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Department:</span>
+          <span class="info-value">{{employee.department}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Role:</span>
+          <span class="info-value">{{employee.role}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Supervisor:</span>
+          <span class="info-value">{{employee.supervisor}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Assessment Period:</span>
+          <span class="info-value">{{formatDate period.startDate}} to {{formatDate period.endDate}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Report Generated:</span>
+          <span class="info-value">{{formatDate "now"}}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Overall Performance Score -->
+    <div class="score-card">
+      <div>Overall Performance Score</div>
+      <div class="score">{{performance.overallScore}}</div>
+      <div class="grade">Grade {{performance.grade}}</div>
+      <div style="margin-top: 10px; font-size: 10pt;">Ranking: {{performance.ranking}}</div>
+    </div>
+
+    <!-- Category Performance -->
+    <h2 class="section-title">Performance by Category</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Category / KPI</th>
+          <th style="width: 100px; text-align: center;">Weight</th>
+          <th style="width: 100px; text-align: center;">Score</th>
+          <th style="width: 200px;">Progress</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each performance.categories}}
+        <tr class="kpi-category">
+          <td>{{this.name}}</td>
+          <td style="text-align: center;">{{this.weight}}%</td>
+          <td style="text-align: center;"><strong>{{this.score}}</strong></td>
+          <td>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: {{this.score}}%;">{{this.score}}%</div>
+            </div>
+          </td>
+        </tr>
+        {{#each this.kpis}}
+        <tr>
+          <td style="padding-left: 30px;">• {{this.name}}</td>
+          <td style="text-align: center;">—</td>
+          <td style="text-align: center;">{{this.score}}</td>
+          <td>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: {{this.score}}%;">{{this.achieved}}/{{this.target}}</div>
+            </div>
+          </td>
+        </tr>
+        {{/each}}
+        {{/each}}
+      </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Evidence Summary -->
+    <h2 class="section-title">Evidence Submissions</h2>
+    <div class="info-section">
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Total Submissions:</span>
+          <span class="info-value">{{evidence.totalSubmissions}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Approved:</span>
+          <span class="info-value">{{evidence.approved}} <span class="badge badge-success">{{percentage (div evidence.approved evidence.totalSubmissions)}}</span></span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Rejected:</span>
+          <span class="info-value">{{evidence.rejected}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Pending:</span>
+          <span class="info-value">{{evidence.pending}}</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>Key Evidence Highlights</h3>
+    {{#each evidence.highlights}}
+    <div class="evidence-item">
+      <div><strong>{{this.title}}</strong></div>
+      <div class="evidence-date">{{formatDate this.date}} • {{this.category}}</div>
+    </div>
+    {{/each}}
+
+    <!-- Milestones -->
+    <h2 class="section-title">Milestones</h2>
+    <div class="info-section">
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Total Milestones:</span>
+          <span class="info-value">{{milestones.total}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Completed:</span>
+          <span class="info-value">{{milestones.completed}} <span class="badge badge-success">{{percentage (div milestones.completed milestones.total)}}</span></span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">In Progress:</span>
+          <span class="info-value">{{milestones.inProgress}}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Overdue:</span>
+          <span class="info-value">{{milestones.overdue}}</span>
+        </div>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Milestone</th>
+          <th style="width: 150px;">Due Date</th>
+          <th style="width: 120px; text-align: center;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each milestones.items}}
+        <tr>
+          <td>{{this.name}}</td>
+          <td>{{formatDate this.dueDate}}</td>
+          <td style="text-align: center;">
+            {{#if (eq this.status "completed")}}
+            <span class="badge badge-success">Completed</span>
+            {{else}}
+            <span class="badge badge-warning">{{this.status}}</span>
+            {{/if}}
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- Remarks -->
+    <h2 class="section-title">Performance Remarks</h2>
+    
+    <h3>Supervisor's Remarks</h3>
+    <div class="remarks-box">
+      {{remarks.supervisor}}
+    </div>
+
+    <h3>Head of Department's Remarks</h3>
+    <div class="remarks-box">
+      {{remarks.hod}}
+    </div>
+
+    <!-- Signatures -->
+    <div class="signature-section">
+      <div class="signature-box">
+        <strong>Employee Acknowledgment</strong>
+        <div class="signature-line">
+          <div>{{employee.name}}</div>
+          <div style="font-size: 9pt; color: #666;">Date: __________</div>
+        </div>
+      </div>
+      <div class="signature-box">
+        <strong>Supervisor Approval</strong>
+        <div class="signature-line">
+          <div>{{employee.supervisor}}</div>
+          <div style="font-size: 9pt; color: #666;">Date: __________</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Digital Signature -->
+    <div class="digital-signature">
+      <strong>🔒 DIGITALLY SIGNED DOCUMENT</strong>
+      <div style="margin-top: 10px; font-size: 9pt;">
+        This document has been digitally signed by Prabhaav Organization using PKCS#7 standard.
+        <br>
+        Signer: CN=Prabhaav Organization, OU=IT, O=Prabhaav, L=Delhi, ST=Delhi, C=IN
+        <br>
+        Timestamp: {{formatDate "now"}}
+        <br>
+        Algorithm: SHA256withRSA
+      </div>
+    </div>
+
+    <!-- Footer Note -->
+    <div style="margin-top: 30px; padding: 15px; background-color: #f5f5f5; border-radius: 4px; font-size: 9pt; text-align: center; color: #666;">
+      This is a computer-generated document. No signature is required.
+      <br>
+      For verification, visit: https://prabhaav.gov.in/verify or scan the QR code above.
+    </div>
+  </div>
+</body>
+</html>

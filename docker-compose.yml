@@ -1,0 +1,164 @@
+# Docker Compose for Prabhaav Application
+# Includes all services: frontend, API servers, report generation
+
+version: '3.8'
+
+services:
+  # Frontend - Vite dev server
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5174:5174"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    environment:
+      - NODE_ENV=development
+    command: npm run dev -- --host
+    networks:
+      - prabhaav-network
+
+  # Evidence Upload Server
+  evidence-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server:/app/server
+      - ./uploads:/app/uploads
+      - ./temp:/app/temp
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    command: node server/mockEvidenceServer.js
+    networks:
+      - prabhaav-network
+
+  # Admin Server
+  admin-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./server:/app/server
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+    command: node server/mockAdminServer.js
+    networks:
+      - prabhaav-network
+
+  # Report Generation Server
+  report-server:
+    build:
+      context: .
+      dockerfile: Dockerfile.reports
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./server:/app/server
+      - ./workers:/app/workers
+      - ./templates:/app/templates
+      - ./utils:/app/utils
+      - ./storage:/app/storage
+      - ./keys:/app/keys:ro
+    environment:
+      - NODE_ENV=production
+      - PORT=3003
+      - SIGNING_METHOD=local
+      - PRIVATE_KEY_PATH=/app/keys/private.pem
+      - CERTIFICATE_PATH=/app/keys/cert.pem
+      # For production, use AWS KMS:
+      # - SIGNING_METHOD=kms
+      # - AWS_REGION=ap-south-1
+      # - AWS_KMS_KEY_ID=${AWS_KMS_KEY_ID}
+      # - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      # - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    command: node server/mockReportServer.js
+    networks:
+      - prabhaav-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Report Worker (Background job processor)
+  report-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.reports
+    volumes:
+      - ./workers:/app/workers
+      - ./templates:/app/templates
+      - ./utils:/app/utils
+      - ./storage:/app/storage
+      - ./keys:/app/keys:ro
+    environment:
+      - NODE_ENV=production
+      - SIGNING_METHOD=local
+      - PRIVATE_KEY_PATH=/app/keys/private.pem
+      - CERTIFICATE_PATH=/app/keys/cert.pem
+    command: node workers/reportGenerator.js
+    networks:
+      - prabhaav-network
+    depends_on:
+      - report-server
+
+  # Redis (for job queue in production)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - prabhaav-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # AI Assistant Server
+  ai-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3004:3004"
+    volumes:
+      - ./server:/app/server
+      - ./utils:/app/utils
+    environment:
+      - NODE_ENV=production
+      - PORT=3004
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - AI_MODEL=claude-sonnet-4
+      - AI_TEMPERATURE=0.3
+      - AI_MAX_TOKENS=1024
+    command: node server/mockAiServer.js
+    networks:
+      - prabhaav-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  prabhaav-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+    driver: local
